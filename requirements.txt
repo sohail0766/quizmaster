@@ -19,9 +19,11 @@ google-generativeai==0.8.6
 googleapis-common-protos==1.75.0
 grpcio==1.81.0
 grpcio-status==1.71.2
+gunicorn==26.0.0
 httplib2==0.31.2
 idna==3.17
 instaloader==4.15.1
+packaging==26.2
 pillow==12.2.0
 proto-plus==1.28.0
 protobuf==5.29.6
