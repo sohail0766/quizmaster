@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Delete - QuizMaster{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-5">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-body p-5 text-center">
+                <div class="mb-4 bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px;">
+                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                </div>
+
+                <h3 class="fw-bold mb-3 text-dark">Confirm Deletion</h3>
+                <p class="text-muted mb-4">
+                    Are you sure you want to delete the quiz <strong>"{{ quiz.title }}"</strong>?
+                    <br><span class="text-danger small fw-bold">This action cannot be undone and all associated results will be lost.</span>
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger btn-lg py-3 fw-bold rounded-3 shadow-sm">
+                            <i class="fas fa-trash-alt me-2"></i> Yes, Permanently Delete
+                        </button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-light border py-3 fw-bold text-muted rounded-3 mt-2">
+                            No, Keep This Quiz
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <p class="small text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Deleting a quiz will also remove it from students' attempt history.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

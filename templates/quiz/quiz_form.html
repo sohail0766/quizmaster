@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} - QuizMaster{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-primary py-4 px-4 border-0">
+                <div class="d-flex align-items-center">
+                    <!-- Fixed background opacity for icon -->
+                    <div class="p-2 rounded-3 me-3 d-flex align-items-center justify-content-center" style="background-color: rgba(255,255,255,0.2); width: 45px; height: 45px;">
+                        <i class="fa-solid fa-pen-to-square text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0 text-white">{{ title }}</h4>
+                        <p class="text-white text-opacity-75 mb-0 small">Please provide the details for your quiz below.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <form method="post" class="needs-validation">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted ls-1" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                        <div class="input-group">
+                            {{ field }}
+                        </div>
+                        {% if field.help_text %}
+                        <div class="form-text text-muted x-small mt-1">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% if field.errors %}
+                        <div class="text-danger x-small mt-1">
+                            {% for error in field.errors %}<i class="fas fa-exclamation-triangle me-1"></i>{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="d-flex flex-column flex-sm-row gap-2 mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm rounded-3">
+                            <i class="fas fa-save me-2"></i> Save Quiz Details
+                        </button>
+                        {% if quiz %}
+                        <a href="{% url 'quiz_detail_teacher' quiz.pk %}" class="btn btn-light btn-lg border px-4 rounded-3">Cancel</a>
+                        {% else %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-light btn-lg border px-4 rounded-3">Cancel</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-4 p-3 bg-primary bg-opacity-10 rounded-4 border border-primary border-opacity-10">
+            <div class="d-flex">
+                <i class="fas fa-info-circle text-primary me-3 mt-1"></i>
+                <div>
+                    <h6 class="fw-bold text-primary mb-1">Quick Tip</h6>
+                    <p class="text-muted small mb-0">After saving these details, you will be redirected to add questions to your quiz. Make sure to set a realistic time limit!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ls-1 { letter-spacing: 1px; }
+    .x-small { font-size: 0.75rem; }
+    input[type="text"], input[type="number"], select, textarea {
+        display: block;
+        width: 100%;
+        padding: 0.6rem 1rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        background-color: #f8f9fa;
+        background-clip: padding-box;
+        border: 1px solid #dee2e6;
+        appearance: none;
+        border-radius: 10px;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+    input:focus, select:focus, textarea:focus {
+        background-color: #fff;
+        border-color: var(--primary);
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+    }
+</style>
+{% endblock %}

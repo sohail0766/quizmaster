@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Online Quiz System{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS with HCI Principles -->
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3f37c9;
+            --secondary: #4cc9f0;
+            --success: #10b981;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --bg-body: #f7f9fc;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0.75rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary) !important;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            color: var(--text-main) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            margin: 0 0.2rem;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            color: var(--primary) !important;
+            background: var(--gray-100);
+        }
+
+        .nav-link.active {
+            color: var(--primary) !important;
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        /* --- Button Get Started --- */
+        .btn-get-started {
+            background-color: var(--primary) !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+            border-radius: 10px !important;
+            padding: 0.6rem 1.5rem !important;
+            box-shadow: 0 4px 14px 0 rgba(67, 97, 238, 0.39);
+            border: none !important;
+            transition: var(--transition);
+        }
+
+        .btn-get-started:hover {
+            background-color: var(--primary-dark) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.23);
+        }
+
+        /* --- Footer --- */
+        .footer {
+            margin-top: auto;
+            background: #fff;
+            border-top: 1px solid var(--gray-200);
+            padding: 4rem 0 3rem;
+        }
+
+        .footer-title {
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--gray-100);
+            padding-top: 2rem;
+            margin-top: 3rem;
+        }
+
+        .dev-badge {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* --- Global Styles --- */
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            background: #fff;
+        }
+
+        .btn {
+            border-radius: 10px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .alert {
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-nav { padding-top: 1rem; }
+            .nav-link { margin-bottom: 0.5rem; }
+            .footer { text-align: center; }
+            .footer-link:hover { padding-left: 0; }
+            .btn-get-started { width: 100%; display: block; text-align: center; margin-top: 10px; margin-left: 0 !important; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+            <i class="fas fa-graduation-cap me-2 fa-lg"></i>
+            <span>QuizMaster</span>
+        </a>
+
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'quiz_list' %}active{% endif %}" href="{% url 'quiz_list' %}">
+                        Explore Quizzes
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav align-items-center">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                {{ user.username|first|upper }}
+                            </div>
+                            <span>{{ user.first_name|default:user.username }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2 p-2 rounded-4">
+                            <li><a class="dropdown-item rounded-3 py-2" href="{% url 'profile' %}"><i class="fas fa-user-circle me-2 opacity-50"></i>My Profile</a></li>
+                            <li><a class="dropdown-item rounded-3 py-2" href="{% url 'change_password' %}"><i class="fas fa-shield-halved me-2 opacity-50"></i>Security</a></li>
+                            <li><hr class="dropdown-divider opacity-50"></li>
+                            <li><a class="dropdown-item rounded-3 py-2 text-danger" href="{% url 'logout' %}"><i class="fas fa-power-off me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Sign In</a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn-get-started d-inline-block text-decoration-none" href="{% url 'register' %}">Get Started</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4 flex-grow-1">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                <i class="fas fa-info-circle me-3 fa-lg"></i>
+                <div>{{ message }}</div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row g-4 text-center text-lg-start">
+            <div class="col-lg-5">
+                <a class="navbar-brand d-inline-block mb-3" href="{% url 'home' %}">
+                    <i class="fas fa-graduation-cap me-2"></i>QuizMaster
+                </a>
+                <p class="text-muted small pe-lg-5">
+                    The ultimate platform for modern learners and educators. Test your skills, track your progress, and achieve academic excellence through our interactive quiz system.
+                </p>
+                <div class="d-flex gap-3 mt-4 justify-content-center justify-content-lg-start">
+                    <a href="#" class="text-muted"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-muted"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-muted"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3 offset-lg-1">
+                <h6 class="footer-title">Quick Navigation</h6>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'home' %}" class="footer-link">Home</a></li>
+                    <li><a href="/#features" class="footer-link">Features</a></li>
+                    <li><a href="/#how-it-works" class="footer-link">How it Works</a></li>
+                    <li><a href="{% url 'quiz_list' %}" class="footer-link">Browse Quizzes</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-6 col-lg-2">
+                <h6 class="footer-title">Account</h6>
+                <ul class="list-unstyled">
+                    {% if user.is_authenticated %}
+                    <li><a href="{% url 'dashboard' %}" class="footer-link">My Dashboard</a></li>
+                    <li><a href="{% url 'profile' %}" class="footer-link">Profile Settings</a></li>
+                    {% else %}
+                    <li><a href="{% url 'login' %}" class="footer-link">Sign In</a></li>
+                    <li><a href="{% url 'register' %}" class="footer-link">Create Account</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom text-center">
+            <p class="mb-1 text-muted small">© 2026 <strong>Online Quiz System</strong> | BS(CS) 7th Morning - Federal Urdu University</p>
+            <p class="mb-0 small text-muted">Developed by <span class="dev-badge">Muhammad Sohail, Sanaullah Abbasi, Muhammad Faizan Ali</span></p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% block title %}Teacher Dashboard - QuizMaster{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-12 text-center text-md-start">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="fw-bold mb-1">Teacher Control Center 🛠️</h2>
+                <p class="text-muted mb-0">Manage your quizzes, categories, and monitor student performance.</p>
+            </div>
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="{% url 'category_create' %}" class="btn btn-outline-primary shadow-sm">
+                    <i class="fas fa-tags me-2"></i>New Category
+                </a>
+                <a href="{% url 'quiz_create' %}" class="btn btn-primary shadow-sm">
+                    <i class="fas fa-plus me-2"></i>Create Quiz
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overview Stats -->
+<div class="row g-4 mb-5 text-center">
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100 py-2">
+            <div class="card-body">
+                <div class="text-primary opacity-50 mb-2"><i class="fas fa-book fa-2x"></i></div>
+                <h3 class="fw-bold mb-0">{{ quizzes.count }}</h3>
+                <small class="text-muted text-uppercase fw-semibold ls-1">My Quizzes</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100 py-2">
+            <div class="card-body">
+                <div class="text-success opacity-50 mb-2"><i class="fas fa-user-friends fa-2x"></i></div>
+                <h3 class="fw-bold mb-0">{{ total_students }}</h3>
+                <small class="text-muted text-uppercase fw-semibold ls-1">Students</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100 py-2">
+            <div class="card-body">
+                <div class="text-info opacity-50 mb-2"><i class="fas fa-pen-nib fa-2x"></i></div>
+                <h3 class="fw-bold mb-0">{{ total_results }}</h3>
+                <small class="text-muted text-uppercase fw-semibold ls-1">Attempts</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100 py-2">
+            <div class="card-body">
+                <div class="text-warning opacity-50 mb-2"><i class="fas fa-star fa-2x"></i></div>
+                <h3 class="fw-bold mb-0">{{ avg_score }}%</h3>
+                <small class="text-muted text-uppercase fw-semibold ls-1">Avg Score</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Quiz Management -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0"><i class="fas fa-list-check me-2 text-primary"></i>My Published Quizzes</h5>
+                <a href="{% url 'category_list' %}" class="btn btn-sm btn-light border small">Manage Categories</a>
+            </div>
+            <div class="card-body p-0">
+                {% if quizzes %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small text-uppercase">
+                            <tr>
+                                <th class="ps-4 border-0">Quiz Details</th>
+                                <th class="border-0">Category</th>
+                                <th class="border-0 text-center">Questions</th>
+                                <th class="border-0">Status</th>
+                                <th class="pe-4 border-0 text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for quiz in quizzes %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold">{{ quiz.title }}</div>
+                                    <div class="text-muted small">ID: #{{ quiz.pk }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2">
+                                        {{ quiz.category.name }}
+                                    </span>
+                                </td>
+                                <td class="text-center fw-semibold">{{ quiz.total_questions }}</td>
+                                <td>
+                                    {% if quiz.is_published %}
+                                    <span class="d-flex align-items-center text-success small fw-bold">
+                                        <i class="fas fa-circle me-1" style="font-size: 8px;"></i> Published
+                                    </span>
+                                    {% else %}
+                                    <span class="d-flex align-items-center text-warning small fw-bold">
+                                        <i class="fas fa-circle me-1" style="font-size: 8px;"></i> Draft
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <div class="btn-group">
+                                        <a href="{% url 'quiz_detail_teacher' quiz.pk %}" class="btn btn-sm btn-light border" title="View Detail">
+                                            <i class="fas fa-chart-line text-primary"></i>
+                                        </a>
+                                        <a href="{% url 'quiz_edit' quiz.pk %}" class="btn btn-sm btn-light border" title="Edit Quiz">
+                                            <i class="fas fa-edit text-warning"></i>
+                                        </a>
+                                        <a href="{% url 'quiz_delete' quiz.pk %}" class="btn btn-sm btn-light border" title="Delete">
+                                            <i class="fas fa-trash text-danger"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-plus-circle fa-4x text-light mb-3"></i>
+                    <p class="text-muted">You haven't created any quizzes yet.</p>
+                    <a href="{% url 'quiz_create' %}" class="btn btn-primary rounded-pill px-4">Create First Quiz</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Summary -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-4 px-4">
+                <h5 class="fw-bold mb-0"><i class="fas fa-chart-column me-2 text-primary"></i>Quiz Performance</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <canvas id="performanceChart" style="max-height: 250px;"></canvas>
+
+                <div class="mt-4 border-top pt-4">
+                    <h6 class="fw-bold mb-3 small text-uppercase ls-1 text-muted">Quick Insights</h6>
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span>Total Participation</span>
+                        <span class="fw-bold">{{ total_results }}</span>
+                    </div>
+                    <div class="progress mb-3" style="height: 6px;">
+                        <div class="progress-bar bg-primary" style="width: 100%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span>Passing Rate (Avg)</span>
+                        <span class="fw-bold text-success">{{ avg_score }}%</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" style="width: {{ avg_score }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ls-1 { letter-spacing: 1px; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+fetch('/chart-data/')
+.then(r => r.json())
+.then(data => {
+    const ctx = document.getElementById('performanceChart');
+    if(data.length === 0) {
+        ctx.parentElement.innerHTML = '<div class="text-center py-5 text-muted">No data available</div>';
+        return;
+    }
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.name),
+            datasets: [{
+                label: 'Avg Score %',
+                data: data.map(d => d.avg),
+                backgroundColor: 'rgba(67, 97, 238, 0.8)',
+                hoverBackgroundColor: '#4361ee',
+                borderRadius: 8,
+                barThickness: 20
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: '#f1f5f9' },
+                    ticks: { callback: value => value + '%' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

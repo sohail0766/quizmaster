@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% block title %}Add Questions: {{ quiz.title }} - QuizMaster{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'quiz_detail_teacher' quiz.pk %}" class="text-decoration-none">Quiz Details</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Add Questions</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h2 class="fw-bold mb-1">Populate Quiz 📝</h2>
+                <p class="text-muted mb-0">Add multiple-choice questions to <strong>{{ quiz.title }}</strong></p>
+            </div>
+            <button class="btn btn-dark rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#aiModal">
+                <i class="fas fa-robot me-2 text-info"></i> Generate with AI
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Question Form -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+            <div class="card-header bg-primary py-3 px-4 border-0">
+                <h5 class="text-white mb-0 fw-bold">Manual Entry Form</h5>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post" class="needs-validation">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted ls-1" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger x-small mt-1">
+                            {% for error in field.errors %}<i class="fas fa-exclamation-triangle me-1"></i>{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+                        <button type="submit" name="add_another" class="btn btn-primary btn-lg px-4 fw-bold shadow-sm rounded-3">
+                            <i class="fas fa-plus me-2"></i> Save & Add Another
+                        </button>
+                        <button type="submit" class="btn btn-outline-primary btn-lg px-4 fw-bold rounded-3">
+                            <i class="fas fa-check me-2"></i> Save & Finish
+                        </button>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <a href="{% url 'quiz_detail_teacher' quiz.pk %}" class="text-muted small text-decoration-none">
+                            <i class="fas fa-arrow-left me-1"></i> Return to details
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Preview / Questions Added -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 bg-white">
+            <div class="card-header bg-light py-3 px-4 border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">Questions Added</h5>
+                <span class="badge bg-primary rounded-pill px-3">{{ questions.count }} Questions</span>
+            </div>
+            <div class="card-body p-4 overflow-auto" style="max-height: 700px;">
+                {% if questions %}
+                    {% for q in questions %}
+                    <div class="p-3 bg-light rounded-4 mb-3 border-start border-4 border-primary position-relative">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold small text-primary">Question {{ forloop.counter }}</span>
+                            <div class="dropdown">
+                                <button class="btn btn-link btn-sm text-muted p-0" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
+                                    <li><a class="dropdown-item rounded-2" href="{% url 'question_edit' q.pk %}"><i class="fas fa-pen me-2 text-warning"></i>Edit</a></li>
+                                    <li><a class="dropdown-item rounded-2 text-danger" href="{% url 'question_delete' q.pk %}"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p class="mb-2 fw-semibold">{{ q.text }}</p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge bg-white text-dark border px-2 py-1">Correct: {{ q.correct_answer }}</span>
+                            <span class="badge bg-white text-dark border px-2 py-1">{{ q.marks }} Marks</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="text-muted opacity-25 mb-3"><i class="fas fa-clipboard-list fa-4x"></i></div>
+                        <h6 class="fw-bold">No questions yet</h6>
+                        <p class="text-muted small">The questions you add will appear here for review.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Modal -->
+<div class="modal fade" id="aiModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold"><i class="fas fa-magic text-info me-2"></i>AI MCQ Generator</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted small mb-4">Tell us the topic, and our AI will craft high-quality MCQs for your quiz instantly.</p>
+
+                <form id="aiGenForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted ls-1">Specific Topic</label>
+                        <input type="text" id="aiTopic" class="form-control bg-light border-0 py-2" placeholder="e.g. Photosynthesis, Python Loops, WWII" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted ls-1">Number of Questions</label>
+                        <select id="aiNum" class="form-select bg-light border-0 py-2">
+                            <option value="3">3 Questions</option>
+                            <option value="5" selected>5 Questions</option>
+                            <option value="10">10 Questions</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="aiSubmitBtn" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm">
+                        <span id="btnText">Generate Questions</span>
+                        <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                    </button>
+                </form>
+                <div id="aiError" class="alert alert-danger mt-3 d-none small"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.getElementById('aiGenForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const topic = document.getElementById('aiTopic').value;
+    const num = document.getElementById('aiNum').value;
+    const btn = document.getElementById('aiSubmitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const errorDiv = document.getElementById('aiError');
+
+    // UI Loading State
+    btn.disabled = true;
+    btnText.innerText = "Generating... Please wait";
+    btnSpinner.classList.remove('d-none');
+    errorDiv.classList.add('d-none');
+
+    const formData = new FormData();
+    formData.append('topic', topic);
+    formData.append('num_questions', num);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch("{% url 'ai_generate_questions' quiz.pk %}", {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Success! Refresh the page to show new questions
+            window.location.reload();
+        } else {
+            throw new Error(data.error || 'Something went wrong');
+        }
+    })
+    .catch(error => {
+        btn.disabled = false;
+        btnText.innerText = "Generate Questions";
+        btnSpinner.classList.add('d-none');
+        errorDiv.innerText = error.message;
+        errorDiv.classList.remove('d-none');
+    });
+});
+</script>
+{% endblock %}
+
+<style>
+    .ls-1 { letter-spacing: 1px; }
+    .x-small { font-size: 0.75rem; }
+    input[type="text"], input[type="number"], select, textarea {
+        display: block;
+        width: 100%;
+        padding: 0.6rem 1rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        background-color: #f8f9fa;
+        background-clip: padding-box;
+        border: 1px solid #dee2e6;
+        appearance: none;
+        border-radius: 10px;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+    input:focus, select:focus, textarea:focus {
+        background-color: #fff;
+        border-color: var(--primary);
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}My Profile - QuizMaster{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-lg-6 col-md-8">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <!-- Profile Header/Cover -->
+            <div class="bg-primary py-5 text-center position-relative">
+                <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 20px 20px;"></div>
+                <div class="mb-3 position-relative d-inline-block">
+                    <div class="bg-white rounded-circle p-1 shadow-lg">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                            <i class="fas fa-user text-primary fa-4x"></i>
+                        </div>
+                    </div>
+                    {% if profile.is_teacher %}
+                    <span class="badge bg-warning text-dark border border-white border-2 rounded-pill position-absolute bottom-0 end-0 px-3 py-2">
+                        <i class="fas fa-crown me-1"></i> Teacher
+                    </span>
+                    {% else %}
+                    <span class="badge bg-success border border-white border-2 rounded-pill position-absolute bottom-0 end-0 px-3 py-2">
+                        <i class="fas fa-user-graduate me-1"></i> Student
+                    </span>
+                    {% endif %}
+                </div>
+                <h3 class="text-white fw-bold mb-0">{{ user.get_full_name|default:user.username }}</h3>
+                <p class="text-white text-opacity-75 small">Member since {{ user.date_joined|date:"F Y" }}</p>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <div class="row g-4 mb-5">
+                    <div class="col-12">
+                        <h6 class="text-muted text-uppercase fw-bold ls-1 mb-4 small">Account Information</h6>
+                        <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3 border-start border-4 border-primary">
+                            <div class="bg-white rounded-circle p-2 me-3 shadow-sm">
+                                <i class="fas fa-at text-primary"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Username</small>
+                                <span class="fw-bold">{{ user.username }}</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3 border-start border-4 border-primary">
+                            <div class="bg-white rounded-circle p-2 me-3 shadow-sm">
+                                <i class="fas fa-envelope text-primary"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Email Address</small>
+                                <span class="fw-bold">{{ user.email }}</span>
+                            </div>
+                        </div>
+                        {% if profile.bio %}
+                        <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3 border-start border-4 border-primary">
+                            <div class="bg-white rounded-circle p-2 me-3 shadow-sm">
+                                <i class="fas fa-quote-left text-primary"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Bio / Description</small>
+                                <span class="fw-bold">{{ profile.bio }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="d-grid gap-3">
+                    <a href="{% url 'change_password' %}" class="btn btn-outline-primary py-3 fw-bold rounded-3">
+                        <i class="fas fa-shield-halved me-2"></i> Security Settings
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary py-3 fw-bold rounded-3 shadow-sm">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <div class="card-footer bg-light border-0 text-center py-3">
+                <small class="text-muted">Need help with your account? <a href="#" class="text-primary text-decoration-none fw-bold">Contact Support</a></small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ls-1 { letter-spacing: 1px; }
+</style>
+{% endblock %}

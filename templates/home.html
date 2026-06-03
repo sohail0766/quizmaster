@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% block title %}Home - QuizMaster{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div id="top" class="row justify-content-center py-5 mb-5">
+    <div class="col-lg-10 text-center">
+        <div class="mb-4">
+            <span class="p-3 bg-primary bg-opacity-10 text-primary rounded-circle d-inline-block shadow-sm">
+                <i class="fas fa-graduation-cap fa-4x"></i>
+            </span>
+        </div>
+        <h1 class="display-3 fw-bold mb-3" style="color: var(--dark); letter-spacing: -1px;">
+            Master Your Knowledge <span class="text-primary">Effortlessly</span>
+        </h1>
+        <p class="lead text-muted mb-5 fs-4 mx-auto" style="max-width: 800px;">
+            A complete online quiz platform designed for modern learning. Create, attempt, and track progress with precision and ease.
+        </p>
+        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-5 shadow-lg py-3">
+                <i class="fas fa-rocket me-2"></i>Get Started Free
+            </a>
+            <a href="{% url 'login' %}" class="btn btn-light btn-lg px-5 border shadow-sm py-3">
+                <i class="fas fa-sign-in-alt me-2 text-primary"></i>Sign In to Account
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Bar -->
+<div id="stats" class="row g-3 mb-5">
+    <div class="col-6 col-md-3">
+        <div class="card p-3 border-0 shadow-sm text-center h-100" style="background: linear-gradient(135deg, var(--primary), #6366f1); color: white;">
+            <div class="bg-white bg-opacity-25 rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                <i class="fas fa-layer-group"></i>
+            </div>
+            <h3 class="fw-bold mb-0">{{ total_quizzes }}</h3>
+            <p class="mb-0 opacity-75 small fw-medium">Active Quizzes</p>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card p-3 border-0 shadow-sm text-center h-100" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+            <div class="bg-white bg-opacity-25 rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3 class="fw-bold mb-0">{{ total_users }}</h3>
+            <p class="mb-0 opacity-75 small fw-medium">Registered Users</p>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card p-3 border-0 shadow-sm text-center h-100" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
+            <div class="bg-white bg-opacity-25 rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <h3 class="fw-bold mb-0">{{ total_questions }}</h3>
+            <p class="mb-0 opacity-75 small fw-medium">Total Questions</p>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card p-3 border-0 shadow-sm text-center h-100" style="background: linear-gradient(135deg, #6366f1, #4361ee); color: white;">
+            <div class="bg-white bg-opacity-25 rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="fas fa-pen-nib"></i>
+            </div>
+            <h3 class="fw-bold mb-0">{{ total_attempts }}</h3>
+            <p class="mb-0 opacity-75 small fw-medium">Quiz Attempts</p>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div id="features" class="py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold h1">Key <span class="text-primary">Features</span></h2>
+        <p class="text-muted">Everything you need to manage and attempt quizzes online</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm hover-up text-center">
+                <div class="mb-4">
+                    <span class="p-3 bg-primary bg-opacity-10 text-primary rounded-4 d-inline-block">
+                        <i class="fas fa-chalkboard-teacher fa-2x"></i>
+                    </span>
+                </div>
+                <h4 class="fw-bold">Teacher Dashboard</h4>
+                <p class="text-muted">Create interactive quizzes, manage categories, and monitor student performance with real-time analytics.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm hover-up text-center">
+                <div class="mb-4">
+                    <span class="p-3 bg-info bg-opacity-10 text-info rounded-4 d-inline-block">
+                        <i class="fas fa-user-graduate fa-2x"></i>
+                    </span>
+                </div>
+                <h4 class="fw-bold">Student Portal</h4>
+                <p class="text-muted">Explore various categories, attempt timed quizzes, and get instant feedback on your performance.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm hover-up text-center">
+                <div class="mb-4">
+                    <span class="p-3 bg-success bg-opacity-10 text-success rounded-4 d-inline-block">
+                        <i class="fas fa-file-pdf fa-2x"></i>
+                    </span>
+                </div>
+                <h4 class="fw-bold">Smart Reporting</h4>
+                <p class="text-muted">Download detailed PDF reports and visualize your progress through interactive charts and historical data.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Section -->
+<div id="categories" class="py-5 mb-5 bg-white rounded-4 shadow-sm">
+    <div class="container px-4">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-1">Explore Topics</h2>
+            <p class="text-muted">Pick a category and test your expertise</p>
+        </div>
+        <div class="row g-3 justify-content-center">
+            {% for cat in categories|slice:":6" %}
+            <div class="col-md-4 col-lg-2 col-6">
+                <a href="{% url 'quiz_list' %}?category={{ cat.id }}" class="text-decoration-none">
+                    <div class="card h-100 p-3 text-center border-0 bg-light bg-opacity-50 hover-primary-border transition">
+                        <div class="mb-2 text-primary">
+                            <i class="fas fa-folder fa-lg"></i>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-1 small text-truncate">{{ cat.name }}</h6>
+                        <small class="text-muted" style="font-size: 0.7rem;">Explore Quizzes</small>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <p class="text-muted text-center">Categories will appear here</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- How it Works Section -->
+<div id="how-it-works" class="py-5 text-center">
+    <h2 class="fw-bold mb-5">How it Works</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="step-card">
+                <div class="step-number shadow-sm">1</div>
+                <h5 class="fw-bold">Create Account</h5>
+                <p class="text-muted px-4 small">Sign up as a student or teacher to access the platform's features.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="step-card">
+                <div class="step-number shadow-sm">2</div>
+                <h5 class="fw-bold">Pick a Challenge</h5>
+                <p class="text-muted px-4 small">Choose from active quizzes across various topics and categories.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="step-card">
+                <div class="step-number shadow-sm">3</div>
+                <h5 class="fw-bold">View Results</h5>
+                <p class="text-muted px-4 small">Get instant feedback, review answers, and download your performance report.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ls-1 { letter-spacing: 1px; }
+    .transition { transition: all 0.3s ease; }
+    .hover-up:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+    }
+    .hover-primary-border:hover {
+        background-color: white !important;
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.1) !important;
+        transform: scale(1.05);
+    }
+    .step-card { position: relative; }
+    .step-number {
+        width: 45px;
+        height: 45px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        margin: 0 auto 20px;
+        border: 4px solid #fff;
+    }
+</style>
+{% endblock %}

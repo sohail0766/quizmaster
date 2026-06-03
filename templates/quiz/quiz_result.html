@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Result: {{ result.quiz.title }} - QuizMaster{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Result Header -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-body p-0">
+                <div class="row g-0">
+                    <div class="col-md-5 text-center p-5 d-flex flex-column justify-content-center align-items-center"
+                         style="background: {% if result.percentage >= 50 %}linear-gradient(135deg, #10b981, #059669){% else %}linear-gradient(135deg, #ef4444, #dc2626){% endif %}; color: white;">
+
+                        {% if result.percentage >= 50 %}
+                            <!-- Fixed container with explicit RGBA background -->
+                            <div class="mb-4 rounded-circle d-flex align-items-center justify-content-center shadow-lg"
+                                 style="width: 100px; height: 100px; background-color: rgba(255, 255, 255, 0.2);">
+                                <i class="fa-solid fa-trophy fa-3x text-white"></i>
+                            </div>
+                            <h2 class="fw-bold mb-1">Passed!</h2>
+                            <p class="opacity-75">Outstanding performance!</p>
+                        {% else %}
+                            <div class="mb-4 rounded-circle d-flex align-items-center justify-content-center shadow-lg"
+                                 style="width: 100px; height: 100px; background-color: rgba(255, 255, 255, 0.2);">
+                                <i class="fa-solid fa-arrows-rotate fa-3x text-white"></i>
+                            </div>
+                            <h2 class="fw-bold mb-1">Keep Trying!</h2>
+                            <p class="opacity-75">Practice makes perfect.</p>
+                        {% endif %}
+
+                        <div class="mt-4 w-100 px-4">
+                            <div class="d-flex justify-content-between mb-2 small text-uppercase fw-bold opacity-75">
+                                <span>Passing Score</span>
+                                <span>50%</span>
+                            </div>
+                            <div class="progress bg-white bg-opacity-20" style="height: 10px;">
+                                <div class="progress-bar bg-white" role="progressbar" style="width: {{ result.percentage }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-7 p-5">
+                        <div class="mb-4 pb-4 border-bottom">
+                            <h4 class="fw-bold mb-1 text-dark">{{ result.quiz.title }}</h4>
+                            <p class="text-muted mb-0"><i class="far fa-calendar-alt me-2"></i>Attempted on {{ result.attempted_at|date:"F d, Y @ P" }}</p>
+                        </div>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-6">
+                                <div class="small text-muted text-uppercase fw-bold mb-1">Your Score</div>
+                                <div class="h3 fw-bold mb-0 text-primary">{{ result.score }} <span class="text-muted small fw-normal">/ {{ result.total_marks }}</span></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="small text-muted text-uppercase fw-bold mb-1">Percentage</div>
+                                <div class="h3 fw-bold mb-0 {% if result.percentage >= 50 %}text-success{% else %}text-danger{% endif %}">{{ result.percentage }}%</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{% url 'download_pdf' result.pk %}" class="btn btn-danger px-4 rounded-pill">
+                                <i class="fas fa-file-pdf me-2"></i>Download PDF
+                            </a>
+                            <a href="{% url 'quiz_list' %}" class="btn btn-primary px-4 rounded-pill">
+                                <i class="fas fa-search me-2"></i>Try Others
+                            </a>
+                            <a href="{% url 'dashboard' %}" class="btn btn-light border px-4 rounded-pill">
+                                <i class="fas fa-home me-2"></i>Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Answer Review -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-white py-4 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0"><i class="fas fa-check-double me-2 text-primary"></i>Answer Key & Review</h5>
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                    {{ answers.count }} Questions Total
+                </span>
+            </div>
+            <div class="card-body p-4">
+                {% for answer in answers %}
+                <div class="p-4 mb-4 rounded-4 border-start border-4 {% if answer.is_correct %}bg-success bg-opacity-10 border-success{% else %}bg-danger bg-opacity-10 border-danger{% endif %}">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="fw-bold text-dark">Question {{ forloop.counter }}</span>
+                        {% if answer.is_correct %}
+                            <span class="text-success small fw-bold"><i class="fas fa-check-circle me-1"></i> Correct Answer (+{{ answer.question.marks }} Marks)</span>
+                        {% else %}
+                            <span class="text-danger small fw-bold"><i class="fas fa-times-circle me-1"></i> Incorrect Answer (0 Marks)</span>
+                        {% endif %}
+                    </div>
+
+                    <p class="fs-5 mb-4 text-dark fw-medium">{{ answer.question.text }}</p>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 {% if answer.selected_answer == answer.question.correct_answer %}bg-white border border-success{% else %}bg-white border{% endif %}">
+                                <div class="small text-muted mb-1">Your Response</div>
+                                <div class="fw-bold {% if answer.is_correct %}text-success{% else %}text-danger{% endif %}">
+                                    {{ answer.selected_answer|default:"No Answer Provided" }}
+                                </div>
+                            </div>
+                        </div>
+                        {% if not answer.is_correct %}
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 bg-white border border-success">
+                                <div class="small text-muted mb-1">Correct Answer</div>
+                                <div class="fw-bold text-success">{{ answer.question.correct_answer }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
