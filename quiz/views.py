@@ -257,7 +257,12 @@ def ai_generate_questions(request, pk):
             elif '```' in content:
                 content = content.split('```')[1].split('```')[0].strip()
 
-            questions_data = json.loads(content)
+            try:
+                questions_data = json.loads(content)
+            except json.JSONDecodeError:
+                return JsonResponse({
+                    'error': 'AI Error: The response returned from Gemini was not in a valid JSON format. Please try again.'
+                }, status=500)
 
             created_count = 0
             for q_data in questions_data:
@@ -280,7 +285,20 @@ def ai_generate_questions(request, pk):
             })
 
         except Exception as e:
-            return JsonResponse({'error': f"AI Error: {str(e)}"}, status=500)
+            err_str = str(e)
+            if "RESOURCE_EXHAUSTED" in err_str or "429" in err_str or "quota" in err_str.lower():
+                user_friendly_error = (
+                    "Gemini API quota exceeded or rate limit reached. "
+                    "If you are on the free tier, please wait a minute or check your API key / billing details on Google AI Studio."
+                )
+                return JsonResponse({'error': f"AI Error: {user_friendly_error}"}, status=429)
+            elif "API_KEY_INVALID" in err_str or "403" in err_str or "invalid api key" in err_str.lower():
+                user_friendly_error = (
+                    "The configured Gemini API key is invalid or unauthorized. "
+                    "Please check your GEMINI_API_KEY settings."
+                )
+                return JsonResponse({'error': f"AI Error: {user_friendly_error}"}, status=403)
+            return JsonResponse({'error': f"AI Error: {err_str}"}, status=500)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
