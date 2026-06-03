@@ -7,6 +7,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-quiz-system-secret-ke
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://quizmasterfuuast.up.railway.app',
+    'https://triumphant-creativity-production-3c74.up.railway.app',
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
