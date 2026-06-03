@@ -11,7 +11,7 @@ from .models import Profile, Quiz, Question, Result, StudentAnswer, Category
 from .forms import RegisterForm, QuizForm, QuestionForm, CategoryForm, PasswordChangeFormCustom
 from .decorators import teacher_required, student_required
 import json
-import google.generativeai as genai
+from google import genai
 
 def home(request):
     if request.user.is_authenticated:
@@ -237,8 +237,7 @@ def ai_generate_questions(request, pk):
             return JsonResponse({'error': 'Gemini API key not configured in settings.py'}, status=500)
 
         try:
-            genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            client = genai.Client(api_key=api_key)
 
             prompt = f"""
             Generate exactly {num_questions} multiple-choice questions about '{topic}'.
@@ -247,7 +246,10 @@ def ai_generate_questions(request, pk):
             {{"text": "question", "option_a": "...", "option_b": "...", "option_c": "...", "option_d": "...", "correct_answer": "A/B/C/D"}}
             """
 
-            response = model.generate_content(prompt)
+            response = client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=prompt
+            )
             content = response.text.strip()
 
             if '```json' in content:
@@ -419,7 +421,6 @@ def download_pdf_result(request, pk):
     story.append(Spacer(1, 0.5*inch))
 
     story.append(Paragraph("PERFORMANCE SUMMARY", ParagraphStyle('SectionHeader', fontSize=12, fontName='Helvetica-Bold', spaceAfter=10)))
-
     ans_data = [['NO.', 'QUESTION', 'CORRECT', 'SELECTED', 'RESULT']]
     answers = result.answers.select_related('question').all()
     for i, ans in enumerate(answers, 1):
