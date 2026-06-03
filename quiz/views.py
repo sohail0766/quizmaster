@@ -13,8 +13,6 @@ from .decorators import teacher_required, student_required
 import json
 import google.generativeai as genai
 
-# ==================== AUTH VIEWS ====================
-
 def home(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -83,8 +81,6 @@ def change_password(request):
                 messages.error(request, 'Old password is incorrect.')
     return render(request, 'auth/change_password.html', {'form': form})
 
-# ==================== DASHBOARD ====================
-
 @login_required
 def dashboard(request):
     profile = get_object_or_404(Profile, user=request.user)
@@ -115,8 +111,6 @@ def dashboard(request):
 def profile_view(request):
     profile = get_object_or_404(Profile, user=request.user)
     return render(request, 'profile.html', {'profile': profile})
-
-# ==================== QUIZ VIEWS ====================
 
 @login_required
 def quiz_list(request):
@@ -227,8 +221,6 @@ def question_delete(request, pk):
     messages.success(request, 'Question deleted!')
     return redirect('quiz_detail_teacher', pk=quiz_pk)
 
-# ==================== AI GENERATION ====================
-
 @login_required
 @teacher_required
 def ai_generate_questions(request, pk):
@@ -246,16 +238,7 @@ def ai_generate_questions(request, pk):
 
         try:
             genai.configure(api_key=api_key)
-
-            # Simple Try-Fallback Model selection
-            model_to_use = 'gemini-1.5-flash'
-            try:
-                model = genai.GenerativeModel(model_to_use)
-                # Test call to see if model is supported
-                model.get_model()
-            except:
-                model_to_use = 'gemini-pro'
-                model = genai.GenerativeModel(model_to_use)
+            model = genai.GenerativeModel('gemini-1.5-flash')
 
             prompt = f"""
             Generate exactly {num_questions} multiple-choice questions about '{topic}'.
@@ -267,7 +250,6 @@ def ai_generate_questions(request, pk):
             response = model.generate_content(prompt)
             content = response.text.strip()
 
-            # Robust JSON cleaning
             if '```json' in content:
                 content = content.split('```json')[1].split('```')[0].strip()
             elif '```' in content:
@@ -299,8 +281,6 @@ def ai_generate_questions(request, pk):
             return JsonResponse({'error': f"AI Error: {str(e)}"}, status=500)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
-
-# ==================== STUDENT QUIZ ATTEMPT ====================
 
 @login_required
 @student_required
@@ -363,8 +343,6 @@ def quiz_result(request, pk):
         'answers': answers,
     })
 
-# ==================== PDF REPORT ====================
-
 @login_required
 def download_pdf_result(request, pk):
     from reportlab.lib.pagesizes import A4
@@ -386,18 +364,16 @@ def download_pdf_result(request, pk):
     styles = getSampleStyleSheet()
     story = []
 
-    # Clean Professional Styles (B&W)
     header_style = ParagraphStyle('HeaderStyle', fontSize=32, fontName='Helvetica-Bold', alignment=TA_LEFT, leading=36)
     sub_header_style = ParagraphStyle('SubHeaderStyle', fontSize=10, fontName='Helvetica', alignment=TA_LEFT, letterSpacing=1, textColor=colors.black)
     label_style = ParagraphStyle('LabelStyle', fontSize=10, fontName='Helvetica-Bold')
     value_style = ParagraphStyle('ValueStyle', fontSize=10, fontName='Helvetica')
     table_text_style = ParagraphStyle('TableText', fontSize=9, fontName='Helvetica', leading=12)
 
-    # 1. Header Section - Using Table to prevent line overlap
     header_data = [[Paragraph("QUIZMASTER", header_style)]]
-    header_table = Table(header_data, colWidths=[A4[0]-100]) # A4 width - margins
+    header_table = Table(header_data, colWidths=[A4[0]-100])
     header_table.setStyle(TableStyle([
-        ('LINEBELOW', (0, 0), (-1, -1), 2, colors.black), # Line below text
+        ('LINEBELOW', (0, 0), (-1, -1), 2, colors.black),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
         ('LEFTPADDING', (0, 0), (-1, -1), 0),
     ]))
@@ -406,7 +382,6 @@ def download_pdf_result(request, pk):
     story.append(Paragraph("OFFICIAL PERFORMANCE TRANSCRIPT", sub_header_style))
     story.append(Spacer(1, 0.4*inch))
 
-    # 2. Information Table
     status_text = "PASSED" if result.percentage >= 50 else "FAILED"
     info_data = [
         [Paragraph("STUDENT", label_style), Paragraph(result.student.get_full_name().upper() or result.student.username.upper(), value_style),
@@ -416,7 +391,6 @@ def download_pdf_result(request, pk):
         [Paragraph("CATEGORY", label_style), Paragraph(result.quiz.category.name.upper(), value_style),
          Paragraph("STATUS", label_style), Paragraph(status_text, label_style)],
     ]
-
     info_table = Table(info_data, colWidths=[1.1*inch, 2.4*inch, 1.1*inch, 2.4*inch])
     info_table.setStyle(TableStyle([
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -425,7 +399,6 @@ def download_pdf_result(request, pk):
     story.append(info_table)
     story.append(Spacer(1, 0.4*inch))
 
-    # 3. Score Card
     grade = "A" if result.percentage >= 80 else "B" if result.percentage >= 60 else "C" if result.percentage >= 50 else "F"
     score_data = [
         ["TOTAL SCORE", "PERCENTAGE", "GRADE"],
@@ -445,12 +418,10 @@ def download_pdf_result(request, pk):
     story.append(score_table)
     story.append(Spacer(1, 0.5*inch))
 
-    # 4. Detailed Analysis
     story.append(Paragraph("PERFORMANCE SUMMARY", ParagraphStyle('SectionHeader', fontSize=12, fontName='Helvetica-Bold', spaceAfter=10)))
 
     ans_data = [['NO.', 'QUESTION', 'CORRECT', 'SELECTED', 'RESULT']]
     answers = result.answers.select_related('question').all()
-
     for i, ans in enumerate(answers, 1):
         q_p = Paragraph(ans.question.text, table_text_style)
         correct_p = Paragraph(ans.question.correct_answer, table_text_style)
@@ -470,7 +441,6 @@ def download_pdf_result(request, pk):
     ]))
     story.append(ans_table)
 
-    # 5. Footer
     story.append(Spacer(1, 0.8*inch))
     story.append(HRFlowable(width="100%", thickness=0.5, color=colors.black))
     footer_style = ParagraphStyle('Footer', fontSize=8, textColor=colors.black, alignment=TA_CENTER, spaceBefore=5)
@@ -481,8 +451,6 @@ def download_pdf_result(request, pk):
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="Transcript_{result.student.username}_{result.pk}.pdf"'
     return response
-
-# ==================== CHARTS DATA ====================
 
 @login_required
 def chart_data(request):
@@ -497,8 +465,6 @@ def chart_data(request):
         results = Result.objects.filter(student=request.user)
         data = [{'name': r.quiz.title[:20], 'score': r.percentage} for r in results]
         return HttpResponse(json.dumps(data), content_type='application/json')
-
-# ==================== CATEGORY VIEWS ====================
 
 @login_required
 @teacher_required
