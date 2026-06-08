@@ -502,3 +502,33 @@ def category_create(request):
             messages.success(request, 'Category created!')
             return redirect('category_list')
     return render(request, 'quiz/category_form.html', {'form': form})
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Disallow: /admin/",
+        "Disallow: /quiz/*/attempt/",
+        "Disallow: /result/",
+        f"Sitemap: {request.scheme}://{request.get_host()}/sitemap.xml"
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+
+def sitemap_xml(request):
+    host = f"{request.scheme}://{request.get_host()}"
+    urls = [
+        "",
+        "/register/",
+        "/login/",
+        "/quizzes/",
+    ]
+
+    # Add dynamic category URLs to sitemap
+    for cat in Category.objects.all():
+        urls.append(f"/quizzes/?category={cat.id}")
+
+    xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml_content += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    for url in urls:
+        xml_content += f"  <url>\n    <loc>{host}{url}</loc>\n    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n"
+    xml_content += '</urlset>'
+    return HttpResponse(xml_content, content_type="application/xml")
