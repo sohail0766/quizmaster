@@ -41,4 +41,7 @@ urlpatterns = [
     # SEO
     path('robots.txt', views.robots_txt, name='robots_txt'),
     path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
+
+    # Google Search Console Verification
+    path('googled243ab1274c211cc.html', views.google_verify, name='google_verify'),
 ]

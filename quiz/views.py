@@ -532,3 +532,9 @@ def sitemap_xml(request):
         xml_content += f"  <url>\n    <loc>{host}{url}</loc>\n    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n"
     xml_content += '</urlset>'
     return HttpResponse(xml_content, content_type="application/xml")
+
+def google_verify(request):
+    return HttpResponse(
+        "google-site-verification: googled243ab1274c211cc.html",
+        content_type="text/html"
+    )
