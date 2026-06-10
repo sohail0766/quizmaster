@@ -1,3 +1,5 @@
+Django==6.0.5
+ExifRead==3.5.1
 annotated-types==0.7.0
 anyio==4.13.0
 asgiref==3.11.1
@@ -9,18 +11,8 @@ charset-normalizer==3.4.7
 colorama==0.4.6
 cryptography==48.0.0
 distro==1.9.0
-Django==6.0.5
 dnspython==2.8.0
-ExifRead==3.5.1
-google-ai-generativelanguage==0.6.15
-google-api-core==2.25.2
-google-api-python-client==2.197.0
-google-auth==2.53.0
-google-auth-httplib2==0.4.0
-google-genai==2.7.0
-googleapis-common-protos==1.75.0
-grpcio==1.81.0
-grpcio-status==1.71.2
+groq==0.11.0
 gunicorn==26.0.0
 h11==0.16.0
 httpcore==1.0.9
@@ -30,10 +22,6 @@ idna==3.17
 instaloader==4.15.1
 packaging==26.2
 pillow==12.2.0
-proto-plus==1.28.0
-protobuf==5.29.6
-pyasn1==0.6.3
-pyasn1_modules==0.4.2
 pycparser==3.0
 pydantic==2.13.4
 pydantic_core==2.46.4

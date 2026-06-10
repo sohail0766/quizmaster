@@ -80,4 +80,5 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+# Gemini API Key set up directly from Google AI Studio
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')

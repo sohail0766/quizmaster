@@ -11,7 +11,7 @@ from .models import Profile, Quiz, Question, Result, StudentAnswer, Category
 from .forms import RegisterForm, QuizForm, QuestionForm, CategoryForm, PasswordChangeFormCustom
 from .decorators import teacher_required, student_required
 import json
-from google import genai
+from groq import Groq
 
 def home(request):
     if request.user.is_authenticated:
@@ -221,6 +221,7 @@ def question_delete(request, pk):
     messages.success(request, 'Question deleted!')
     return redirect('quiz_detail_teacher', pk=quiz_pk)
 
+
 @login_required
 @teacher_required
 def ai_generate_questions(request, pk):
@@ -232,25 +233,26 @@ def ai_generate_questions(request, pk):
         if not topic:
             return JsonResponse({'error': 'Topic is required'}, status=400)
 
-        api_key = getattr(settings, 'GEMINI_API_KEY', None)
+        api_key = getattr(settings, 'GROQ_API_KEY', None)
         if not api_key:
-            return JsonResponse({'error': 'Gemini API key not configured in settings.py'}, status=500)
+            return JsonResponse({'error': 'Groq API key not configured in settings.'}, status=500)
 
         try:
-            client = genai.Client(api_key=api_key)
+            client = Groq(api_key=api_key)
 
-            prompt = f"""
-            Generate exactly {num_questions} multiple-choice questions about '{topic}'.
-            Output MUST be a valid JSON array of objects. No preamble, no markdown.
-            Each object format:
-            {{"text": "question", "option_a": "...", "option_b": "...", "option_c": "...", "option_d": "...", "correct_answer": "A/B/C/D"}}
-            """
-
-            response = client.models.generate_content(
-                model='gemini-2.0-flash',
-                contents=prompt
+            prompt = (
+                f"Generate exactly {num_questions} multiple-choice questions about '{topic}'."
+                " Output MUST be a valid JSON array of objects. No preamble, no markdown, no extra text."
+                " Each object format:"
+                ' {"text": "question", "option_a": "...", "option_b": "...", "option_c": "...", "option_d": "...", "correct_answer": "A/B/C/D"}'
             )
-            content = response.text.strip()
+
+            response = client.chat.completions.create(
+                model='llama3-8b-8192',
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+            )
+            content = response.choices[0].message.content.strip()
 
             if '```json' in content:
                 content = content.split('```json')[1].split('```')[0].strip()
@@ -261,7 +263,7 @@ def ai_generate_questions(request, pk):
                 questions_data = json.loads(content)
             except json.JSONDecodeError:
                 return JsonResponse({
-                    'error': 'AI Error: The response returned from Gemini was not in a valid JSON format. Please try again.'
+                    'error': 'AI Error: Response was not valid JSON. Please try again.'
                 }, status=500)
 
             created_count = 0
@@ -286,21 +288,14 @@ def ai_generate_questions(request, pk):
 
         except Exception as e:
             err_str = str(e)
-            if "RESOURCE_EXHAUSTED" in err_str or "429" in err_str or "quota" in err_str.lower():
-                user_friendly_error = (
-                    "Gemini API quota exceeded or rate limit reached. "
-                    "If you are on the free tier, please wait a minute or check your API key / billing details on Google AI Studio."
-                )
-                return JsonResponse({'error': f"AI Error: {user_friendly_error}"}, status=429)
-            elif "API_KEY_INVALID" in err_str or "403" in err_str or "invalid api key" in err_str.lower():
-                user_friendly_error = (
-                    "The configured Gemini API key is invalid or unauthorized. "
-                    "Please check your GEMINI_API_KEY settings."
-                )
-                return JsonResponse({'error': f"AI Error: {user_friendly_error}"}, status=403)
-            return JsonResponse({'error': f"AI Error: {err_str}"}, status=500)
+            if "429" in err_str or "rate_limit" in err_str.lower() or "quota" in err_str.lower():
+                return JsonResponse({'error': 'AI Error: Groq rate limit reached. Please wait a moment and try again.'}, status=429)
+            elif "401" in err_str or "invalid api key" in err_str.lower() or "authentication" in err_str.lower():
+                return JsonResponse({'error': 'AI Error: Invalid Groq API key. Please check your GROQ_API_KEY setting.'}, status=403)
+            return JsonResponse({'error': f'AI Error: {err_str}'}, status=500)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
 
 @login_required
 @student_required
